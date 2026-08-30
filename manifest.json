@@ -1,19 +1,18 @@
 {
-  "name": "Tahfizh Pro - Monitoring Hafalan Qur'an",
-  "short_name": "TahfizhPro",
-  "description": "Sistem Monitoring Setoran Hafalan Qur'an Multi-Role",
-  "start_url": "./index.html",
+  "name": "Nama Aplikasi Lengkap",
+  "short_name": "AppSaya",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#0A2647",
-  "theme_color": "#0A2647",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "https://i.ibb.co.com/2Y0Hrq3w/Untitled-design.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://i.ibb.co.com/2Y0Hrq3w/Untitled-design.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
