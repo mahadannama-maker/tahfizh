@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pwa-gas-v1';
+const CACHE_NAME = 'pwa-gas-v2';
 const urlsToCache = [
   './',
   './index.html',
