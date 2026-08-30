@@ -1,4 +1,5 @@
-const CACHE_NAME = 'pwa-gas-v2';
+// Ganti nama versi setiap kali Anda mengupdate file apapun di GitHub
+const CACHE_NAME = 'pwa-gas-v2'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -10,6 +11,22 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+  self.skipWaiting(); // Memaksa update Service Worker
+});
+
+// Kode baru untuk otomatis menghapus cache versi sebelumnya (v1)
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
   );
 });
 
