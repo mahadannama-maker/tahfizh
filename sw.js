@@ -1,5 +1,5 @@
 // Ganti nama versi setiap kali Anda mengupdate file apapun di GitHub
-const CACHE_NAME = 'pwa-gas-v2'; 
+const CACHE_NAME = 'pwa-gas-v3'; 
 const urlsToCache = [
   './',
   './index.html',
