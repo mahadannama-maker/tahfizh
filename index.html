@@ -10,105 +10,186 @@
   <meta name="theme-color" content="#ffffff">
   
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; font-family: sans-serif; }
-    iframe { width: 100%; height: 100%; border: none; }
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
-    /* Desain Pop-up Install Otomatis */
-    #install-popup {
-      display: none; /* Disembunyikan awalnya */
+    /* Styling Iframe Aplikasi GAS */
+    iframe { width: 100%; height: 100%; border: none; z-index: 1; position: relative; }
+    
+    /* 1. Overlay Latar Belakang (Transparan Gelap) */
+    #install-overlay {
+      display: none; /* Sembunyi awalnya */
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7); /* Hitam transparan 70% */
+      z-index: 9998; /* Di atas iframe */
+      /* Menggunakan flexbox untuk memposisikan anak tepat di tengah */
+      display: flex; 
+      justify-content: center; /* Tengah horizontal */
+      align-items: center; /* Tengah vertikal */
+      opacity: 0;
+      transition: opacity 0.4s ease; /* Efek pudar halus */
+      pointer-events: none; /* Iframe masih bisa disentuh saat ini sembunyi */
+    }
+
+    /* State saat overlay aktif/muncul */
+    #install-overlay.show {
+      opacity: 1;
+      pointer-events: auto; /* Memblokir sentuhan ke iframe */
+    }
+
+    /* 2. Styling Kotak Pop-up di Tengah */
+    #install-modal {
       background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      z-index: 9999;
+      padding: 30px;
+      border-radius: 20px; /* Sudut membulat modern */
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); /* Bayangan tegas agar menonjol */
       text-align: center;
-      border: 1px solid #ddd;
+      width: 85%; /* Lebar di HP */
+      max-width: 400px; /* Lebar maksimal di tablet/PC */
+      transform: scale(0.8); /* Awalnya sedikit mengecil */
+      transition: transform 0.4s ease; /* Efek animasi membesar */
     }
-    #install-popup p {
-      margin: 0 0 15px 0;
+
+    /* Efek animasi pop-up membesar saat muncul */
+    #install-overlay.show #install-modal {
+      transform: scale(1);
+    }
+
+    /* Styling Konten di dalam Modal */
+    .app-icon-placeholder {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px auto;
+      background-color: #eee;
+      border-radius: 18px;
+      background-image: url('icon-192.png'); /* Memakai icon Anda */
+      background-size: cover;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    #install-modal h2 {
+      margin: 0 0 10px 0;
+      font-size: 22px;
+      color: #1c1e21;
+    }
+
+    #install-modal p {
+      margin: 0 0 25px 0;
       font-size: 16px;
-      color: #333;
-      font-weight: bold;
+      color: #606770;
+      line-height: 1.5;
     }
+
+    /* Styling Tombol-tombol */
+    .action-buttons {
+      display: flex;
+      flex-direction: column; /* Tombol tumpuk vertikal */
+      gap: 12px;
+    }
+
     #btn-install {
-      background-color: #007bff;
+      background-color: #007bff; /* Warna biru utama */
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+      padding: 15px;
+      border-radius: 12px;
       font-size: 16px;
       font-weight: bold;
-      width: 100%;
-      margin-bottom: 10px;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
+
+    #btn-install:active {
+      background-color: #0056b3; /* Warna saat ditekan */
+    }
+
     #btn-close {
       background: none;
       border: none;
       color: #777;
       font-size: 14px;
-      text-decoration: underline;
+      padding: 10px;
       cursor: pointer;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Link GAS Anda -->
+  <!-- Iframe Aplikasi GAS (Latar Belakang) -->
   <iframe src="https://script.google.com/macros/s/AKfycbxbsw18EFULmVdtE7ubyPd5RG0emHvg3c69TeFZnl2l3380kAhyskGUvrs3NOhHhj0org/exec" allow="camera; microphone; geolocation"></iframe>
   
-  <!-- Kotak Pop-up Install -->
-  <div id="install-popup">
-    <p>Install Aplikasi Ini di HP Anda 🚀</p>
-    <button id="btn-install">Install Sekarang</button>
-    <button id="btn-close">Nanti Saja</button>
+  <!-- STRUKTUR BARU: Overlay penuh layar -->
+  <div id="install-overlay">
+    <!-- Kotak Modal yang ada di tengah -->
+    <div id="install-modal">
+      <div class="app-icon-placeholder"></div>
+      <h2>Install Aplikasi</h2>
+      <p>Akses aplikasi ini lebih cepat dan mudah langsung dari layar utama HP Anda.</p>
+      
+      <div class="action-buttons">
+        <button id="btn-install">Tambahkan ke Layar Utama</button>
+        <button id="btn-close">Nanti Saja</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // 1. Mendaftarkan Service Worker
+    // 1. Service Worker (Tetap sama)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js');
       });
     }
 
-    // 2. Logika Pop-up Install Otomatis
+    // 2. Logika Pop-up Modal Tengah
     let deferredPrompt;
-    const installPopup = document.getElementById('install-popup');
+    const installOverlay = document.getElementById('install-overlay');
     const btnInstall = document.getElementById('btn-install');
     const btnClose = document.getElementById('btn-close');
 
-    // Menangkap event instalasi bawaan browser
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Mencegah mini-infobar bawaan Chrome muncul
+      // Cegah pop-up bawaan asli muncul
       e.preventDefault();
-      // Menyimpan event untuk dipanggil nanti
+      // Simpan event
       deferredPrompt = e;
-      // Menampilkan pop-up custom buatan kita
-      installPopup.style.display = 'block';
+      
+      // Tampilkan Overlay & Modal dengan animasi
+      installOverlay.style.display = 'flex'; // Set display flex dulu
+      setTimeout(() => {
+        installOverlay.classList.add('show'); // Baru tambahkan class animasinya
+      }, 10); // Jeda micro agar animasi CSS jalan
     });
 
-    // Jika tombol "Install Sekarang" diklik
+    // Proses Instalasi
     btnInstall.addEventListener('click', async () => {
-      // Sembunyikan pop-up kita
-      installPopup.style.display = 'none';
-      // Munculkan pop-up instalasi resmi dari sistem
+      // Sembunyikan modal
+      hideModal();
+      
+      // Panggil pop-up instalasi asli sistem
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Hasil install: ${outcome}`);
-        deferredPrompt = null; // Reset
+        console.log(`User response: ${outcome}`);
+        deferredPrompt = null;
       }
     });
 
-    // Jika tombol "Nanti Saja" diklik
+    // Tombol Tutup
     btnClose.addEventListener('click', () => {
-      installPopup.style.display = 'none';
+      hideModal();
     });
+
+    // Fungsi untuk menyembunyikan modal dengan animasi
+    function hideModal() {
+      installOverlay.classList.remove('show');
+      setTimeout(() => {
+        installOverlay.style.display = 'none';
+      }, 400); // Samakan dengan durasi transition di CSS
+    }
   </script>
 </body>
 </html>
